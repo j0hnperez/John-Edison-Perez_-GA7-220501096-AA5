@@ -4,12 +4,16 @@
 // POST /api/auth/login     -> inicia sesión y valida credenciales
 
 const express = require('express');
+const path = require('path');
 const authRouter = require('./routes/auth');
 
 const app = express();
 
 // Parseo de JSON en peticiones
 app.use(express.json());
+
+// Servir archivos estáticos para la interfaz de prueba
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Rutas de autenticación montadas en /api/auth
 app.use('/api/auth', authRouter);

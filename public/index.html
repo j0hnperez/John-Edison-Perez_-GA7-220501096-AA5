@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prueba de Autenticación</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #333;
+      margin: 0;
+      padding: 24px;
+    }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+    h1, h2 {
+      margin: 0 0 16px;
+    }
+    form {
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .message {
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+    }
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #f87171;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Prueba de Autenticación</h1>
+    <div id="message"></div>
+
+    <section>
+      <h2>Registro</h2>
+      <form id="register-form">
+        <label for="register-username">Usuario</label>
+        <input id="register-username" type="text" name="username" required />
+        <label for="register-password">Contraseña</label>
+        <input id="register-password" type="password" name="password" required />
+        <button type="submit">Registrar</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Inicio de sesión</h2>
+      <form id="login-form">
+        <label for="login-username">Usuario</label>
+        <input id="login-username" type="text" name="username" required />
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" type="password" name="password" required />
+        <button type="submit">Iniciar sesión</button>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    const messageElement = document.getElementById('message');
+
+    function showMessage(text, type) {
+      messageElement.textContent = text;
+      messageElement.className = 'message ' + (type === 'success' ? 'success' : 'error');
+    }
+
+    async function sendRequest(endpoint, username, password) {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Error en la petición');
+      }
+      return data;
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const username = document.getElementById('register-username').value.trim();
+      const password = document.getElementById('register-password').value.trim();
+
+      try {
+        const data = await sendRequest('/api/auth/register', username, password);
+        showMessage(data.message, 'success');
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+
+      try {
+        const data = await sendRequest('/api/auth/login', username, password);
+        showMessage(data.message, 'success');
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    });
+  </script>
+</body>
+</html>
